@@ -43,61 +43,9 @@ Website bán hàng online, tích hợp cổng thanh toán, nhiều chi nhánh, h
 
 ## 2. Product Mindmap
 
-Bản Xmind gốc: [ReLoop — Product Mindmap trên Xmind](https://app.xmind.com/share/BYQqqcb4). Có 9 phân hệ và 2 quan hệ chéo: *Bán hàng → Tạm giữ tiền* và *Yêu cầu giảm dưới giá sàn → Người gửi duyệt*.
+Bản Xmind gốc: [ReLoop — Product Mindmap trên Xmind](https://app.xmind.com/share/BYQqqcb4). Mindmap có 9 phân hệ và 2 quan hệ chéo: *Bán hàng → Tạm giữ tiền* và *Yêu cầu giảm dưới giá sàn → Người gửi duyệt*.
 
 ![Product Mindmap](docs/mindmap/reloop-mindmap.png)
-
-> Export ảnh từ Xmind (File → Export → PNG) rồi lưu thành `docs/mindmap/reloop-mindmap.png`. Sơ đồ Mermaid bên dưới là bản xem nhanh trên GitHub.
-
-```mermaid
-mindmap
-  root((ReLoop))
-    1. Xác thực & Phân quyền
-      Đăng nhập / Đăng xuất
-      Quên & đặt lại mật khẩu
-      RBAC: Owner · Staff · Consignor
-      Hồ sơ cá nhân
-    2. Người ký gửi
-      Hồ sơ & tài khoản nhận tiền
-      Mời kích hoạt cổng người gửi
-      Chính sách chia tiền riêng
-    3. Nhận hàng ký gửi
-      Phiếu nhận hàng theo lô
-      AI nhận diện ảnh tự điền
-      AI gợi ý giá bán
-      Người gửi xác nhận phiếu
-      In tem QR / mã vạch
-    4. Kho hàng
-      Danh sách & bộ lọc tuổi tồn
-      Giảm giá tự động theo lịch
-      Yêu cầu giảm dưới giá sàn
-      Xử lý hàng hết hạn
-      AI viết caption đăng bán
-    5. Bán hàng
-      Quét mã bán tại quầy
-      Tiền mặt / chuyển khoản
-      Đổi trả trong thời hạn
-    6. Đối soát & Chi trả
-      Sổ cái số dư người gửi
-      Thời gian tạm giữ sau bán
-      Yêu cầu rút tiền
-      Duyệt chi & VietQR
-      Sao kê kỳ PDF
-    7. Cổng người ký gửi
-      Hàng của tôi
-      Số dư & lịch sử
-      Duyệt yêu cầu giảm giá
-    8. Dashboard & Báo cáo
-      KPI doanh thu & hoa hồng
-      Hàng tồn theo tuổi
-      Công nợ người gửi
-      Xuất Excel
-    9. Quản trị
-      Nhân viên & tài khoản
-      Cấu hình chính sách shop
-      Nhật ký hoạt động
-      Thông báo in-app / email
-```
 
 ---
 
@@ -126,11 +74,100 @@ mindmap
 | Báo cáo, xuất Excel | ✅ | — | Sao kê của mình |
 | Nhân viên, cấu hình, nhật ký | ✅ | — | — |
 
-Quyền được kiểm tra ở **backend**; frontend chỉ ẩn nút và menu để cải thiện UX. Ma trận đầy đủ và use case: [docs/03-use-cases.md](docs/03-use-cases.md). User stories INVEST: [docs/04-user-stories.md](docs/04-user-stories.md).
+Quyền được kiểm tra ở **backend**; frontend chỉ ẩn nút và menu để cải thiện UX. Ma trận đầy đủ: [docs/03-use-cases.md](docs/03-use-cases.md).
 
 ---
 
-## 4. Information Architecture
+## 4. Use Case tổng quát
+
+![Use Case tổng quát](docs/usecase/ucd-overview.svg)
+
+| Tác nhân | Tính năng chính |
+|---|---|
+| **Chủ shop** | Quản lý người ký gửi · Nhận hàng · Quản lý kho & giá · Bán hàng · Đối soát & chi trả · Báo cáo & quản trị shop |
+| **Nhân viên** | Quản lý người ký gửi · Nhận hàng · Quản lý kho · Bán hàng & đổi trả |
+| **Người ký gửi** | Xác nhận phiếu & duyệt giảm giá · Theo dõi hàng, ví & rút tiền |
+| **Scheduler** | Tự giảm giá theo lịch · Giải phóng tiền tạm giữ |
+| **Claude API** | Nhận diện ảnh & gợi ý giá khi nhận hàng (`«extend»` Nhận hàng ký gửi: không bắt buộc, AI lỗi vẫn nhập tay được) |
+
+Sơ đồ chi tiết theo từng vai trò (34 use case) và đặc tả luồng: [docs/03-use-cases.md](docs/03-use-cases.md).
+
+---
+
+## 5. User Stories — INVEST
+
+### 5.1 Tiêu chí INVEST
+
+Trước khi đưa vào sprint, mỗi user story đều được kiểm tra theo 6 tiêu chí INVEST:
+
+| Tiêu chí | Ý nghĩa trong ReLoop |
+|---|---|
+| **I**ndependent | Mỗi story tạo ra một kết quả demo được; chỉ phụ thuộc story khác khi thật sự cần |
+| **N**egotiable | Bố cục UI và cách cài đặt có thể đổi, miễn giữ nguyên mục tiêu, quy tắc nghiệp vụ và quyền |
+| **V**aluable | Mỗi story nêu rõ lợi ích cho một vai trò và gắn với painpoint P1–P6 |
+| **E**stimable | Đầu vào, đầu ra, vai trò, quy tắc nghiệp vụ (BRxx) và ngoại lệ đều được ghi rõ |
+| **S**mall | Mỗi story là một năng lực, làm xong trong ≤ 3 ngày/người |
+| **T**estable | Mỗi story có acceptance criteria quan sát được |
+
+### 5.2 Product Backlog
+
+Mỗi story tương ứng với use case cùng số (USxx ↔ UCxx). Ưu tiên theo MoSCoW; kế hoạch 5 tuần gồm tuần 1 làm tài liệu, Sprint 1–4 tương ứng tuần 2–5.
+
+| ID | User story | Ưu tiên | Sprint |
+|---|---|---|---|
+| US01 | Là người dùng, tôi muốn **đăng nhập** để vào đúng khu vực theo vai trò | Must | S1 |
+| US02 | Là người dùng, tôi muốn **đăng xuất** để kết thúc phiên trên thiết bị | Must | S1 |
+| US03 | Là người dùng quên mật khẩu, tôi muốn **nhận link đặt lại qua email** | Could | S4 |
+| US04 | Là nhân viên / người gửi được mời, tôi muốn **kích hoạt tài khoản bằng link mời** | Must | S2 |
+| US05 | Là người dùng, tôi muốn **cập nhật hồ sơ và đổi mật khẩu** | Should | S4 |
+| US06 | Là người dùng, tôi muốn **dashboard theo phạm vi vai trò** | Should | S4 |
+| US07 | Là chủ shop / nhân viên, tôi muốn **tạo và tra cứu người ký gửi** | Must | S1 |
+| US08 | Là chủ shop / nhân viên, tôi muốn **gửi link mời** để người gửi dùng cổng riêng | Must | S2 |
+| US09 | Là chủ shop / nhân viên, tôi muốn **tạo phiếu nhận hàng theo lô** | Must | S1 |
+| US10 | Là nhân viên, tôi muốn **AI nhận diện ảnh và tự điền** thông tin món hàng | Must | S3 |
+| US11 | Là chủ shop, tôi muốn **AI gợi ý giá kèm lý do** dựa trên hàng đã bán | Must | S3 |
+| US12 | Là người gửi, tôi muốn **xác nhận hoặc yêu cầu sửa phiếu** trước khi hàng lên kệ | Must | S2 |
+| US13 | Là nhân viên, tôi muốn **in tem QR** cho món đã xác nhận | Should | S2 |
+| US14 | Là chủ shop / nhân viên, tôi muốn **tìm và lọc kho** theo trạng thái, tuổi tồn | Must | S1 |
+| US15 | Là chủ shop, tôi muốn **điều chỉnh giá** món đang bán (không dưới giá sàn) | Should | S2 |
+| US16 | Là chủ shop, tôi muốn hệ thống **tự giảm giá theo lịch** | Must | S3 |
+| US17 | Là chủ shop, tôi muốn **gửi yêu cầu giảm dưới giá sàn** cho người gửi | Should | S3 |
+| US18 | Là người gửi, tôi muốn **đồng ý hoặc từ chối yêu cầu giảm giá** | Should | S3 |
+| US19 | Là chủ shop / nhân viên, tôi muốn **xử lý hàng sắp/đã hết hạn** | Must | S3 |
+| US20 | Là chủ shop, tôi muốn **báo thất lạc / hư hỏng** để ghi nhận bồi thường | Could | S4 |
+| US21 | Là nhân viên, tôi muốn **AI viết caption đăng bán** | Could | S4 |
+| US22 | Là nhân viên, tôi muốn **bán hàng bằng cách quét mã**, tự ghi phần chia | Must | S2 |
+| US23 | Là nhân viên, tôi muốn **xử lý đổi trả** trong thời hạn | Should | S3 |
+| US24 | Là người gửi, tôi muốn **xem số dư tạm giữ / khả dụng và lịch sử** | Must | S2 |
+| US25 | Là người gửi, tôi muốn **yêu cầu rút tiền** | Must | S3 |
+| US26 | Là chủ shop, tôi muốn **duyệt chi bằng mã VietQR** sinh sẵn | Must | S3 |
+| US27 | Là chủ shop / người gửi, tôi muốn **xuất sao kê PDF theo tháng** | Should | S4 |
+| US28 | Là chủ shop, tôi muốn **tiền tạm giữ tự chuyển sang khả dụng** sau thời hạn đổi trả | Must | S3 |
+| US29 | Là người gửi, tôi muốn **xem hàng của mình** và số ngày còn lại | Must | S2 |
+| US30 | Là chủ shop, tôi muốn **báo cáo doanh thu, hoa hồng, tồn kho, công nợ** và xuất Excel | Should | S4 |
+| US31 | Là chủ shop, tôi muốn **quản lý tài khoản nhân viên** | Must | S1 |
+| US32 | Là chủ shop, tôi muốn **cấu hình tỷ lệ chia, thời hạn, lịch giảm giá, danh mục** | Must | S1 |
+| US33 | Là chủ shop, tôi muốn **xem nhật ký thao tác quan trọng** | Should | S4 |
+| US34 | Là người dùng, tôi muốn **nhận thông báo in-app** khi có việc liên quan đến tôi | Should | S3 |
+
+**Tổng:** 20 Must · 11 Should · 3 Could. Nếu thiếu thời gian, cắt nhóm Could (US03, US20, US21) trước.
+
+### 5.3 Kết quả đánh giá INVEST
+
+Cả **34/34 story đạt đủ 6 tiêu chí**. Ví dụ cách một số story đạt tiêu chí *Estimable* và *Testable*:
+
+| Story | Điều làm story ước lượng & kiểm thử được |
+|---|---|
+| US10 AI nhận diện ảnh | Schema JSON cố định; timeout 15 giây; AI lỗi thì nhập tay; lưu đề xuất gốc của AI để đối chiếu |
+| US16 Giảm giá tự động | Giá mới = max(giá niêm yết × (1 − % giảm), giá sàn), làm tròn 1.000đ; job chạy lại trong ngày không giảm hai lần |
+| US22 Bán hàng POS | Khóa lạc quan chống bán trùng; có ca kiểm thử 2 món của 2 người gửi với tỷ lệ chia khác nhau |
+| US26 Duyệt & chi trả | VietQR chứa đúng STK, số tiền, nội dung `RELOOP <mã>`; từ chối thì hoàn lại số dư |
+
+Bảng đánh giá từng story và acceptance criteria (Gherkin) đầy đủ: [docs/04-user-stories.md](docs/04-user-stories.md).
+
+---
+
+## 6. Information Architecture
 
 ```text
 ReLoop
@@ -159,7 +196,7 @@ Chi tiết screen hierarchy, danh sách màn hình, route và quyền truy cập
 
 ---
 
-## 5. Tài liệu
+## 7. Tài liệu
 
 | # | Yêu cầu | Tài liệu | Trạng thái |
 |---|---|---|---|

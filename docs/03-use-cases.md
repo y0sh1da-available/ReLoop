@@ -93,123 +93,28 @@ Mỗi tài khoản có đúng **một** vai trò. Tài khoản `CONSIGNOR` luôn
 
 ## 4. Use Case Diagram
 
-### 4.1 Tổng quan
+Các sơ đồ được vẽ theo chuẩn UML và sinh từ [usecase/build_usecase_diagrams.py](usecase/build_usecase_diagrams.py). Sửa danh sách use case trong script rồi chạy `python docs/usecase/build_usecase_diagrams.py` để vẽ lại.
 
-Chủ shop và Nhân viên ở bên trái, Người ký gửi và các tác nhân hệ thống ở bên phải. Đường nét đứt là quan hệ `<<extend>>` / `<<include>>`.
+### 4.1 Tổng quát (tính năng chính)
 
-```mermaid
-flowchart LR
-    subgraph left["Tác nhân nội bộ"]
-        direction TB
-        owner(["👤 Chủ shop<br/>OWNER"])
-        staff(["👤 Nhân viên<br/>STAFF"])
-    end
+![Use Case tổng quát](usecase/ucd-overview.svg)
 
-    subgraph system["ReLoop — System Boundary"]
-        direction TB
-        subgraph g1["M1 Xác thực"]
-            uc01(["UC01 Đăng nhập"])
-            uc02(["UC02 Đăng xuất"])
-            uc03(["UC03 Quên mật khẩu"])
-            uc04(["UC04 Kích hoạt tài khoản"])
-            uc05(["UC05 Hồ sơ cá nhân"])
-        end
-        subgraph g2["M2–M3 Người gửi & Nhận hàng"]
-            uc07(["UC07 Quản lý người gửi"])
-            uc08(["UC08 Mời vào cổng"])
-            uc09(["UC09 Tạo phiếu nhận hàng"])
-            uc10(["UC10 AI nhận diện ảnh"])
-            uc11(["UC11 AI gợi ý giá"])
-            uc12(["UC12 Xác nhận phiếu"])
-            uc13(["UC13 In tem QR"])
-        end
-        subgraph g3["M4–M5 Kho & Bán hàng"]
-            uc14(["UC14 Xem kho hàng"])
-            uc15(["UC15 Điều chỉnh giá"])
-            uc16(["UC16 Giảm giá tự động"])
-            uc17(["UC17 Yêu cầu giảm dưới sàn"])
-            uc18(["UC18 Duyệt yêu cầu giảm giá"])
-            uc19(["UC19 Xử lý hàng hết hạn"])
-            uc20(["UC20 Báo thất lạc/hư hỏng"])
-            uc21(["UC21 AI caption"])
-            uc22(["UC22 Bán hàng POS"])
-            uc23(["UC23 Đổi trả"])
-        end
-        subgraph g4["M6–M7 Đối soát & Cổng người gửi"]
-            uc24(["UC24 Số dư & lịch sử"])
-            uc25(["UC25 Yêu cầu rút tiền"])
-            uc26(["UC26 Duyệt & chi trả"])
-            uc27(["UC27 Sao kê PDF"])
-            uc28(["UC28 Giải phóng tạm giữ"])
-            uc29(["UC29 Hàng của tôi"])
-        end
-        subgraph g5["M8–M9 Báo cáo & Quản trị"]
-            uc06(["UC06 Dashboard"])
-            uc30(["UC30 Báo cáo & Excel"])
-            uc31(["UC31 Quản lý nhân viên"])
-            uc32(["UC32 Cấu hình shop"])
-            uc33(["UC33 Nhật ký hoạt động"])
-            uc34(["UC34 Thông báo"])
-        end
-    end
+### 4.2 Chi tiết theo vai trò
 
-    subgraph right["Tác nhân bên ngoài"]
-        direction TB
-        consignor(["👤 Người ký gửi<br/>CONSIGNOR"])
-        sys(["⚙️ Scheduler<br/>SYSTEM"])
-        ai(["🤖 Claude API<br/>AI"])
-    end
+Mỗi tác nhân có một sơ đồ riêng; use case được nhóm theo phân hệ, elip màu tím là use case có dùng AI.
 
-    owner --> uc01 & uc02 & uc03 & uc05 & uc06 & uc07 & uc08 & uc09 & uc12 & uc13 & uc14 & uc15 & uc17 & uc19 & uc20 & uc21 & uc22 & uc23 & uc24 & uc26 & uc27 & uc30 & uc31 & uc32 & uc33 & uc34
-    staff --> uc01 & uc02 & uc03 & uc04 & uc05 & uc06 & uc07 & uc08 & uc09 & uc13 & uc14 & uc19 & uc21 & uc22 & uc23 & uc34
+![Use Case — Chủ shop](usecase/ucd-owner.svg)
 
-    uc01 & uc02 & uc03 & uc04 & uc05 & uc06 & uc12 & uc18 & uc24 & uc25 & uc27 & uc29 & uc34 --- consignor
-    uc16 & uc19 & uc28 --- sys
-    uc10 & uc11 & uc21 --- ai
+![Use Case — Nhân viên](usecase/ucd-staff.svg)
 
-    uc10 -. "#60;#60;extend#62;#62;" .-> uc09
-    uc11 -. "#60;#60;extend#62;#62;" .-> uc09
-    uc17 -. "#60;#60;include#62;#62;" .-> uc18
-    uc22 -. "#60;#60;include#62;#62;" .-> uc28
+![Use Case — Người ký gửi](usecase/ucd-consignor.svg)
 
-    classDef actor fill:#555,color:#fff,stroke:#333
-    classDef ext fill:#7a4fbf,color:#fff,stroke:#5a3596
-    class owner,staff,consignor actor
-    class sys,ai ext
-    style system fill:#f7fbff,stroke:#1168bd,stroke-dasharray:5 5
-```
+![Use Case — Tác nhân hệ thống](usecase/ucd-system.svg)
 
-> Ghi chú quan hệ:
-> - **UC10, UC11 `<<extend>>` UC09:** khi tạo phiếu, người dùng có thể (không bắt buộc) dùng AI. Nếu AI lỗi, vẫn nhập tay được.
-> - **UC17 `<<include>>` UC18:** mọi yêu cầu giảm dưới giá sàn đều phải đi qua bước người gửi duyệt.
-> - **UC22 → UC28:** mỗi giao dịch bán sinh ra một khoản tạm giữ, sau này SYSTEM giải phóng.
-
-### 4.2 Use case theo vai trò (bản rút gọn để chèn slide)
-
-```mermaid
-flowchart TB
-    subgraph roles["Tác nhân"]
-        direction LR
-        owner(["Chủ shop"])
-        staff(["Nhân viên"])
-        consignor(["Người ký gửi"])
-        sys(["Scheduler"])
-    end
-    subgraph system["ReLoop — System Boundary"]
-        direction LR
-        o["<b>Chủ shop</b><br/><br/>UC01–03 · UC05 Tài khoản<br/>UC06 Dashboard toàn shop<br/>UC07–08 Người ký gửi<br/>UC09–13 Nhận hàng + AI<br/>UC14–15 · UC17 Kho & giá<br/>UC19–21 Hết hạn · thất lạc · caption<br/>UC22–23 Bán hàng · đổi trả<br/>UC24 · UC26–27 Đối soát & chi trả<br/>UC30–34 Báo cáo & quản trị"]
-        s["<b>Nhân viên</b><br/><br/>UC01–05 Tài khoản<br/>UC06 Dashboard ca bán<br/>UC07–08 Tạo người gửi · mời<br/>UC09–11 · UC13 Nhận hàng + AI<br/>UC14 Kho · UC19 Hết hạn · UC21 Caption<br/>UC22 Bán hàng<br/>UC23 Đổi trả trong hạn<br/>UC34 Thông báo"]
-        c["<b>Người ký gửi</b><br/><br/>UC01–05 Tài khoản<br/>UC06 Dashboard cá nhân<br/>UC12 Xác nhận phiếu<br/>UC18 Duyệt giảm giá<br/>UC24–25 Số dư · rút tiền<br/>UC27 Sao kê<br/>UC29 Hàng của tôi<br/>UC34 Thông báo"]
-        y["<b>Scheduler</b><br/><br/>UC16 Giảm giá tự động<br/>UC19 Cảnh báo hết hạn<br/>UC28 Giải phóng tạm giữ"]
-    end
-    owner --> o
-    staff --> s
-    consignor --> c
-    sys --> y
-    classDef actor fill:#666,color:#fff,stroke:#333
-    class owner,staff,consignor,sys actor
-    style system fill:#f8fbff,stroke:#1168bd,stroke-dasharray:5 5
-```
+**Quan hệ giữa các use case:**
+- **UC10, UC11 `«extend»` UC09:** khi tạo phiếu, người dùng có thể (không bắt buộc) dùng AI. Nếu AI lỗi, vẫn nhập tay được.
+- **UC17 `«include»` UC18:** mọi yêu cầu giảm dưới giá sàn đều phải đi qua bước người gửi duyệt.
+- **UC22 → UC28:** mỗi giao dịch bán sinh ra một khoản tạm giữ, sau này SYSTEM giải phóng.
 
 ## 5. Đặc tả các use case trọng tâm
 
